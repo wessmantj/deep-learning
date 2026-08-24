@@ -45,3 +45,5 @@ Deep Learning:
 - ...
 
 
+Neural Networks. Input data, unstructured, like images, audio, unformatted text. This data needs to be turned numerical and is collected in matrices or tensors. Then, the tensor/matrix is passed through a Neural Networks (many layers, nodes, types of networks) all following a system of input, manipulated and learns features, represents it how it best understands, and is converted back into human understood output.
+
