@@ -1,0 +1,51 @@
+# Byte-compiled / optimized / cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.conda/
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+profile_default/
+ipython_config.py
+
+# Environment variables / secrets
+.env
+.env.*
+
+# PyTorch / ML artifacts
+*.pt
+*.pth
+*.onnx
+data/
+datasets/
+runs/
+wandb/
+lightning_logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.idea/
+*.swp
+
+# Note: .vscode/ is left tracked so shared editor settings are versioned.
+# Uncomment the next line to ignore it instead.
+# .vscode/
