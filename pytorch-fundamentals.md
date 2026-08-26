@@ -47,3 +47,16 @@ Deep Learning:
 
 Neural Networks. Input data, unstructured, like images, audio, unformatted text. This data needs to be turned numerical and is collected in matrices or tensors. Then, the tensor/matrix is passed through a Neural Networks (many layers, nodes, types of networks) all following a system of input, manipulated and learns features, represents it how it best understands, and is converted back into human understood output.
 
+Differences between types.
+
+Scalar: a single number, 0-dimensional, defined in lowercase
+
+Vector: a number with direction but can also contain many other numbers, 1-dimensional, and defined in lowercase
+
+Matrix: a 2-dimensional array of numbers, definined in UPPERCASE
+
+Tensor: a n-dimensional array of numbers, and a 0-dimensional tensor is a scalar, a 1-dimensional tensor is a vector, also defined UPPERCASE
+
+Why random tensors?
+- Big part in PyTorch because they way many neural networks learn is that they start with tensors full of random numbers and adjust those numbers to better represent the data.
+
