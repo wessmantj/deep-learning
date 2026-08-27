@@ -1,8 +1,7 @@
 """
 00 - PyTorch Fundamentals
-=========================
-Follow-along code for the PyTorch fundamentals section.
-Run locally on Apple Silicon using the MPS (GPU) backend.
+
+Ran locally on Apple Silicon using the MPS (GPU) backend.
 
 Companion notes: pytorch-fundamentals.md
 """
@@ -15,14 +14,15 @@ import matplotlib.pyplot as plt
 print(f"PyTorch version: {torch.__version__}")
 
 
-# =============================================================================
-# 0. Device setup (CPU / GPU)
-# =============================================================================
-# The course uses "cuda" (NVIDIA GPUs). On a Mac we use "mps" (Apple GPU).
-# This block picks the best available device and stores it in `device` so we
-# can send tensors to the GPU later with `.to(device)`.
+# Device setup (CPU / GPU)
+
+"""
+The course uses "cuda" (NVIDIA GPUs). On a Mac we use "mps" (Apple GPU).
+This block picks the best available device and stores it in `device` so we can send tensors to the GPU later with `.to(device)`.
+"""
+
 if torch.cuda.is_available():
-    device = "cuda"          # NVIDIA GPU (e.g. Google Colab)
+    device = "cuda"          # NVIDIA GPU 
 elif torch.backends.mps.is_available():
     device = "mps"           # Apple Silicon GPU
 else:
@@ -34,13 +34,9 @@ x = torch.ones(1, device=device)
 print(x)
 
 
-# =============================================================================
-# 1. Introduction to Tensors
-# =============================================================================
+# Introduction to Tensors
 
-# -----------------------------------------------------------------------------
-# 1.1 Creating tensors
-# -----------------------------------------------------------------------------
+# Creating tensors
 
 # scalar - a single number, 0-dimensional
 scalar = torch.tensor(7)
@@ -69,9 +65,9 @@ print(TENSOR)
 print(TENSOR.ndim)
 print(TENSOR.shape)
 
-# -----------------------------------------------------------------------------
-# 1.2 Random tensors
-# -----------------------------------------------------------------------------
+
+# Random tensors
+
 # Neural networks often start with random numbers and adjust them to fit data.
 
 random_tensor = torch.rand(3, 4, 2)
@@ -84,9 +80,8 @@ random_image_size_tensor = torch.rand(size=(224, 224, 3))
 print(random_image_size_tensor.shape)
 print(random_image_size_tensor.ndim)
 
-# -----------------------------------------------------------------------------
-# 1.3 Zeros, ones, and ranges
-# -----------------------------------------------------------------------------
+
+# Zeros, ones, and ranges
 
 # a tensor of all zeros
 zeros = torch.zeros(size=(3, 4, 2))
@@ -105,25 +100,23 @@ print(one_to_ten)
 ten_zeros = torch.zeros_like(input=one_to_ten)
 print(ten_zeros)
 
-# -----------------------------------------------------------------------------
-# 1.4 Tensor datatypes
-# -----------------------------------------------------------------------------
+
+# Tensor datatypes
 
 float_32_tensor = torch.tensor([3.0, 6.0, 9.0],
                                dtype=None,          # datatype (default float32); see docs for options
                                device=None,         # device the tensor lives on: cpu, cuda, mps
                                requires_grad=False)  # whether PyTorch tracks gradients on it
-print(float_32_tensor)                              # default type is float32
+print(float_32_tensor) # default type is float32
 
-float_16_tensor = float_32_tensor.type(torch.half)  # torch.half == torch.float16
+float_16_tensor = float_32_tensor.type(torch.half) # torch.half == torch.float16
 print(float_16_tensor)
 
 print(float_16_tensor * float_32_tensor)
 
-# -----------------------------------------------------------------------------
-# 1.5 Getting information from tensors (attributes)
-# -----------------------------------------------------------------------------
-# Three you'll reach for constantly: .dtype, .shape, .device
+
+# Getting information from tensors (attributes)
+# Three constantly used: .dtype, .shape, .device
 
 some_tensor = torch.rand(4, 4)
 print(f"Datatype of tensor: {some_tensor.dtype}")
@@ -131,8 +124,54 @@ print(f"Shape of tensor: {some_tensor.shape}")
 print(f"Device tensor lives on: {some_tensor.device}")
 
 
-# =============================================================================
-# 2. Manipulating Tensors
-# =============================================================================
-# TODO: tensor operations - addition, subtraction, element-wise multiplication,
-#       division, and matrix multiplication.
+# Manipulating Tensors
+
+tensor = torch.tensor([1, 2, 3])
+
+# addition with tensors
+print(tensor + 10)
+print(tensor + 100)
+print(torch.add(tensor, 10))
+
+# subtraction with tensors
+print(tensor - 10)
+print(tensor - 5)
+print(torch.subtract(tensor, 5))
+
+# multiplication with tensors (element-wise)
+print(tensor * 10)
+print(tensor * 15)
+print(torch.mul(tensor, 10))
+
+# Matrix Multiplication
+
+# this just flips it to work, but isn't real world application
+tensor = torch.tensor([[12, 1, 20, 4],
+                      [2, 13, 1, 7],
+                      [5, 40, 2, 1]])
+print(torch.matmul(tensor, torch.rot90(tensor, k=1)))
+print(tensor @ torch.rot90(tensor))
+
+# or instead of rot90, we can use .T to flix the axis; this is actually used
+print(f"Original: \n{tensor} \nRotated: \n{tensor.T}")
+print(f"Gram Matrix (normal method): \n{torch.matmul(tensor, tensor.T)}")
+
+
+# Finding the min, max, mean, sum, etc. (tensor aggregation)
+
+x = torch.arange(0, 100.0, 12)
+print(f" Tensor: {x}")
+print(f"Min: {torch.min(x)}")
+print(f"Max: {torch.max(x)}")
+print(f"Mean: {torch.mean(x)}") # will cause TypeError if not float32
+
+print(f"Sum: {torch.sum(x)}") # the normal x.sum() python function works too
+
+# positional min & max
+print(f"Positional/Index Min: {torch.argmin(x)}")
+print(f"Positional/Index Max: {torch.argmax(x)}")
+
+
+
+
+
