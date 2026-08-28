@@ -199,5 +199,20 @@ print(x_stacked)
 # removes all singel dimensions from a single tensor e.g. if shape (A x 1 x B x 1) out tensor shape is (A x B)
 
 print()
-print(f"Pre-squeeze Shape: {x_reshaped.shape} \nPost-squeeze: {x_reshaped.squeeze().shape}")
+x_squeezed = x_reshaped.squeeze()
+print(f"Pre-squeeze Shape: {x_reshaped.shape} \nPost-squeeze: {x_squeezed.shape}")
 
+x_unsqueezed = x_squeezed.unsqueeze(dim=1) # dim changes which one so if orgininal [3, 3] and dim = 0, [1, 3, 3] or dim = 2 [3, 3, 1]
+print(f"Pre-squeeze Shape: {x_reshaped.shape} \nSqueeze: {x_squeezed.shape} \nUnsqueezed Shape: {x_unsqueezed.shape}")
+
+# rearrange dimensions of target tensor in specified order
+
+x_permuited = x_unsqueezed.permute(2, 0, 1) # moves 2nd dim first, then 0th, then 1st. [3, 1, 3] -> [3, 3, 1]
+print(f"Permuited/Rearranged Shape: {x_permuited.shape}")
+
+# indexing within tensors (similar to NumPy)
+
+x = torch.arange(1., 10., 1).reshape(1, 3, 3)
+print()
+print(f"Orginal x: {x} \nOriginal x.shape: {x.shape}")
+print(f"First dimension: {x[0]}\nSecond dimension: {x[0][2]}\nLast dimension: {x[0][1][1]}")
