@@ -159,8 +159,8 @@ print(f"Gram Matrix (normal method): \n{torch.matmul(tensor, tensor.T)}")
 
 # Finding the min, max, mean, sum, etc. (tensor aggregation)
 
-x = torch.arange(0, 100.0, 12)
-print(f" Tensor: {x}")
+x = torch.arange(1, 100.0, 12) 
+print(f"Tensor: \n{x}")
 print(f"Min: {torch.min(x)}")
 print(f"Max: {torch.max(x)}")
 print(f"Mean: {torch.mean(x)}") # will cause TypeError if not float32
@@ -172,6 +172,32 @@ print(f"Positional/Index Min: {torch.argmin(x)}")
 print(f"Positional/Index Max: {torch.argmax(x)}")
 
 
+# Reshaping, stacking, squeezing and unsqueezing tensors
 
+x = torch.arange(1., 10.)
+print("")
+print(f"Original x: {x} \nx.shape: {x.shape}")
 
+# add an extra dimension
+x_reshaped = x.reshape(1, 9), # As long as the reshape sums  to the original size, it will work
+x_reshaped = x.reshape(1, 3, 3)
+print(f"Reshaped x: {x_reshaped} \nNew x.shape: {x_reshaped.shape}")
+
+# change the view
+z = x.view(1, 9) # shares the same memory as x, so changing it changes the original tensor
+z[:, 0] = 5
+print(z)
+print(x)
+
+# stack tensors
+
+x_stacked = torch.stack([x, x, x, x], dim=0)
+print(x_stacked)
+
+ # squeeze tensors
+
+# removes all singel dimensions from a single tensor e.g. if shape (A x 1 x B x 1) out tensor shape is (A x B)
+
+print()
+print(f"Pre-squeeze Shape: {x_reshaped.shape} \nPost-squeeze: {x_reshaped.squeeze().shape}")
 
