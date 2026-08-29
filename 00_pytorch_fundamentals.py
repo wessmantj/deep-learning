@@ -216,3 +216,6 @@ x = torch.arange(1., 10., 1).reshape(1, 3, 3)
 print()
 print(f"Orginal x: {x} \nOriginal x.shape: {x.shape}")
 print(f"First dimension: {x[0]}\nSecond dimension: {x[0][2]}\nLast dimension: {x[0][1][1]}")
+
+print(x[0][2][2]) # 
+print(x[:, :, 2])
