@@ -105,3 +105,13 @@ Tensor operations include:
 - multiplication (element-wise)
 - division
 - matrix multiplication
+
+## How to change shape of tensors
+
+- Reshaping - reshapes an input tensor to a defined shape
+- View - return a view of an input tesnor of certain shape, but keeps the same memory as original
+- Stacking - combine multiple tensors on top of eachother; vertical (vstack) and horizontal (hstack), in pytorc.stack you can define which dimension 
+- Squeeze - removes all `1` dimension from a tensor
+- Unsqueeze - add a `1` dimension to a target tensor
+- Permute - return a view of the inputs with dimesnion permuted (swapped) in a certain way
+ 

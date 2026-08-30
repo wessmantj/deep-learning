@@ -1,4 +1,6 @@
 {
     "python-envs.defaultEnvManager": "ms-python.python:conda",
-    "python-envs.defaultPackageManager": "ms-python.python:conda"
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
+    "python.defaultInterpreterPath": "/Users/wessmantj/miniconda3/envs/deep-learning/bin/python",
+    "python.condaPath": "/Users/wessmantj/miniconda3/condabin/conda"
 }

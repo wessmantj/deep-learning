@@ -28,6 +28,10 @@ ipython_config.py
 .env
 .env.*
 
+# Generated lesson visuals (regenerable PNGs; keep the folder via .gitkeep)
+/viz/*
+!/viz/.gitkeep
+
 # PyTorch / ML artifacts
 *.pt
 *.pth
