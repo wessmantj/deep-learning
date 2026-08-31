@@ -217,5 +217,5 @@ print()
 print(f"Orginal x: {x} \nOriginal x.shape: {x.shape}")
 print(f"First dimension: {x[0]}\nSecond dimension: {x[0][2]}\nLast dimension: {x[0][1][1]}")
 
-print(x[0][2][2]) # 
-print(x[:, :, 2])
+print(x[0][2][2]) # dim 0, dim 2, dim[2]
+print(x[:, :, 2]) # dim 1 & 2, dim[2]
