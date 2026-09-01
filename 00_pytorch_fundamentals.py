@@ -248,3 +248,53 @@ print(tensor_on_mps)
 # Move back to CPU (for NumPy or other)
 tensor_on_cpu = tensor_on_mps.cpu().numpy()
 print(tensor_on_cpu, tensor_on_cpu.device)
+
+# Exercises for Part 1
+print("---------------------------------------------")
+
+# set random seed for exercises below
+RANDOM_SEED = 1234
+# create a random tensor with shape (7, 7)
+torch.mps.manual_seed(RANDOM_SEED)
+tensor = torch.rand(7, 7)
+print(f"7x7 tensor: \n{tensor}")
+print(f"7x7 tensor shape: \n{tensor.shape}")
+
+# perform matrix multiplication on the tensor with another random tensor of shape (1, 7)
+torch.manual_seed(RANDOM_SEED)
+new_tensor = torch.rand(1, 7)
+print(f"1x7 tensor: \n{new_tensor}")
+print(f"1x7 tensor shape: \n{new_tensor.shape}")
+
+trans_new_tensor = new_tensor.T
+print(f"Transposed 1x7 tensor: \n{trans_new_tensor}")
+print(f"Transposed 1x7 (now 7x1) tensor shape: \n{trans_new_tensor.shape}")
+mult_tensors = torch.matmul(tensor, trans_new_tensor)
+print(f"Matrix Mult tensors: \n{mult_tensors}")
+print(f"Matrix Mult tensors shape: \n{mult_tensors.shape}")
+
+# create 2 more random tensors and send to MPS
+
+torch.manual_seed(RANDOM_SEED)
+random_tensor01 = torch.rand(2, 3).to(device)
+random_tensor02 = torch.rand(2, 3).to(device)
+print(f"Random tensors device: \n01: {random_tensor01.device} \n02: {random_tensor02.device}")
+
+random_tensors_mult = torch.matmul(random_tensor01, random_tensor02.T)
+print(f"Matrix Mult random tensors: \n {random_tensors_mult}")
+
+print(f"Max value: {random_tensors_mult.max()}") 
+print(f"Min value: {torch.min(random_tensors_mult)}") # both syntax methods work 
+
+print(f"Max index value: {random_tensors_mult.argmax()}") 
+print(f"Min index value: {torch.argmin(random_tensors_mult)}") # both syntax methods work 
+
+"""
+Make a random tensor with shape (1, 1, 1, 10) and then create a new tensor with all the 1 dimensions removed to be left with a tensor of shape (10). Set the seed to 7 when you create it and print out the first tensor and it's shape as well as the second tensor and it's shape.
+"""
+
+random_tensor = torch.rand(1, 1, 1, 10)
+print(f"Random tensor: \n{random_tensor.shape}")
+
+new_tensor = torch.squeeze(random_tensor)
+print(f"New tensor: {new_tensor.shape}")
