@@ -219,3 +219,25 @@ print(f"First dimension: {x[0]}\nSecond dimension: {x[0][2]}\nLast dimension: {x
 
 print(x[0][2][2]) # dim 0, dim 2, dim[2]
 print(x[:, :, 2]) # dim 1 & 2, dim[2]
+
+# Some numpy tensor conversion
+tensor = torch.ones(7)
+numpy_tensor = tensor.numpy()
+print(tensor.dtype, numpy_tensor.dtype)
+
+rand_tensor_1 = torch.rand(3, 4)
+rand_tensor_2 = torch.rand(3, 4)
+
+print(rand_tensor_1 == rand_tensor_2)
+
+# set random seed, still random but reproducable
+RANDOM_SEED = 324234
+
+torch.manual_seed(RANDOM_SEED) # need to use this format, manual seed in cell, then definition.
+rand_tensor_3 = torch.rand(3, 4)
+
+torch.manual_seed(RANDOM_SEED)
+rand_tensor_4 = torch.rand(3, 4)
+
+print(rand_tensor_3 == rand_tensor_4)
+

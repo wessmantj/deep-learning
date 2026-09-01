@@ -115,3 +115,8 @@ Tensor operations include:
 - Unsqueeze - add a `1` dimension to a target tensor
 - Permute - return a view of the inputs with dimesnion permuted (swapped) in a certain way
  
+
+# Reproducibility 
+
+Neural networks learn starting with random numbers and through billions of tensor operations, they begin to better represent the data being passed in. To reduce randomness,
+say to repeat testing, you will used a random seed. 
