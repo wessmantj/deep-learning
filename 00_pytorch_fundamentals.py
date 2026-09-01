@@ -241,3 +241,10 @@ rand_tensor_4 = torch.rand(3, 4)
 
 print(rand_tensor_3 == rand_tensor_4)
 
+# Moving a tensor to GPU, on mac is MPS
+tensor_on_mps = tensor.to(device)
+print(tensor_on_mps)
+
+# Move back to CPU (for NumPy or other)
+tensor_on_cpu = tensor_on_mps.cpu().numpy()
+print(tensor_on_cpu, tensor_on_cpu.device)
