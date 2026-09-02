@@ -8,7 +8,6 @@ Companion notes: pytorch-fundamentals.md
 
 import torch
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 
 print(f"PyTorch version: {torch.__version__}")
