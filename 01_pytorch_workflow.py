@@ -14,7 +14,7 @@ print(workflow_outline[1])
 
 # create known parameters
 weight = 0.8
-bias = 0.35
+bias = 0.2
 
 # create 
 start = 0
@@ -49,7 +49,7 @@ def plot_predicitons(train_data=X_train,
     plt.legend(prop={"size": 14})
     plt.show()
 
-plot_predicitons()
+# plot_predicitons()
 
 # Creating linear regression model class
 print("\n",workflow_outline[2])
@@ -70,5 +70,23 @@ class LinearRegressionModel(nn.Module): # subclasses nn.Module which contains al
         return self.weights * x + self.bias     # linear regression formula
 
 
+LinearRegressionModel()
 
+# create random seed and instance of the model
+torch.manual_seed(42)
+model_0 = LinearRegressionModel()
+
+# check parameters
+print(f"\n{list(model_0.parameters())}")
+
+print(f"\n{model_0.state_dict()}")
+
+# Making predictions using `torch.inference_mode()`
+
+with torch.inference_mode():    # makes code faster, no gradient tracking, or other background processes, also can use no_grad() for specific removal
+    y_preds = model_0(X_test)
+
+
+print(f"X_test: \n{X_test}\ny_preds: \n{y_preds}")
+print(plot_predicitons(predictions=y_preds))
 
