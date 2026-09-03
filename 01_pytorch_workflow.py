@@ -2,18 +2,19 @@ import torch
 from torch import nn # contains all of PyTorch's neural network building tools (Layers, Containers, Quantization, etc.)
 import matplotlib.pyplot as plt
 
-workflow_outline = {1: "data (prep and load)",
-                    2: "build model",
-                    3: "fitting model to data",
-                    4: "making predictions and evaluating a model (inference)",
-                    5: "saving and loading a model", 
-                    6: "combining it all together"}
+workflow_outline = {1: " --- Data (prepare and load) --- ",
+                    2: " --- Build model --- ",
+                    3: " --- Fitting model to data --- ",
+                    4: " --- Making predictions and evaluating a model (inference) --- ",
+                    5: " --- Saving and loading a model --- ", 
+                    6: " --- Combining it all together --- "}
 
 # 1. Data (prep and load)
+print(workflow_outline[1])
 
 # create known parameters
-weight = 0.7
-bias = 0.3
+weight = 0.8
+bias = 0.35
 
 # create 
 start = 0
@@ -49,4 +50,25 @@ def plot_predicitons(train_data=X_train,
     plt.show()
 
 plot_predicitons()
+
+# Creating linear regression model class
+print("\n",workflow_outline[2])
+
+class LinearRegressionModel(nn.Module): # subclasses nn.Module which contains all the tools for building neural networks
+    def __init__(self):
+        super().__init__()
+
+        # init model parameters
+        self.weights = nn.Parameter(torch.randn(1,
+                                                requires_grad=True,     # default param, means PyTorch tracks graidents for the parameter
+                                                dtype=torch.float32))
+        self.bias = nn.Parameter(torch.randn(1,
+                                             requires_grad=True,
+                                             dtype=torch.float32))
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.weights * x + self.bias     # linear regression formula
+
+
+
 
