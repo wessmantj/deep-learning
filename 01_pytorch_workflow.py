@@ -51,7 +51,7 @@ def plot_predicitons(train_data=X_train,
 
 # plot_predicitons()
 
-# Creating linear regression model class
+# 2. Creating linear regression model class
 print("\n",workflow_outline[2])
 
 class LinearRegressionModel(nn.Module): # subclasses nn.Module which contains all the tools for building neural networks
@@ -88,5 +88,15 @@ with torch.inference_mode():    # makes code faster, no gradient tracking, or ot
 
 
 print(f"X_test: \n{X_test}\ny_preds: \n{y_preds}")
-print(plot_predicitons(predictions=y_preds))
+# print(plot_predicitons(predictions=y_preds))
+
+# 3. Train model
+print("\n",workflow_outline[3])
+
+# set up a loss function
+loss_fn = nn.L1Loss()
+
+# set up an optimizer
+optimizer = torch.optim.SGD(params=model_0.parameters(),    # stocastic gradient descent (random) for the parameters we want to optimize
+                            lr=0.01)        # learning rate, very important hyperparameter you can set
 
