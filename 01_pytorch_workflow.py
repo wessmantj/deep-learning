@@ -100,3 +100,16 @@ loss_fn = nn.L1Loss()
 optimizer = torch.optim.SGD(params=model_0.parameters(),    # stocastic gradient descent (random) for the parameters we want to optimize
                             lr=0.01)        # learning rate, very important hyperparameter you can set
 
+# Building a training & testing loops in PyTorch
+
+epochs = 1       # count of loops through the data... hyperparameter
+
+for epoch in range(epochs):    # loop through the data
+
+    model_0.train()            # training mode for model, sets requires_grad = True
+    
+    y_pred = model_0(X_train)  # 1. forward pass
+    
+    model_0.eval()             # evaluation mode, sets requires_grad = False
+    
+    

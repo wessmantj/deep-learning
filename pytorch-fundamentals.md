@@ -1,4 +1,4 @@
-# PyTorch Fundamentals — Notes
+# PyTorch Fundamentals - Notes
 
 Companion code: [`00_pytorch_fundamentals.py`](./00_pytorch_fundamentals.py)
 
