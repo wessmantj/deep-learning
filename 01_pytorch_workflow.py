@@ -49,7 +49,6 @@ def plot_predicitons(train_data=X_train,
     plt.legend(prop={"size": 14})
     plt.show()
 
-# plot_predicitons()
 
 # 2. Creating linear regression model class
 print("\n",workflow_outline[2])
@@ -102,7 +101,7 @@ optimizer = torch.optim.SGD(params=model_0.parameters(),    # stocastic gradient
 
 # Building a training & testing loops in PyTorch
 
-epochs = 1       # count of loops through the data... hyperparameter
+epochs = 230       # count of loops through the data... hyperparameter
 
 for epoch in range(epochs):    # 0. loop through the data
 
@@ -110,7 +109,8 @@ for epoch in range(epochs):    # 0. loop through the data
     y_pred = model_0(X_train)  # 1. forward pass
     
     # 2. calculate the loss
-    loss = loss_fn(y_preds, y_train)   # MAE or difference between model's predictions and labels (input, target)
+    loss = loss_fn(y_pred, y_train)# MAE or difference between model's predictions and labels (input, target)
+    print(f"Loss at {epoch} interations: {loss}")
     
     # 3. optimizer zero grad
     optimizer.zero_grad()
@@ -124,4 +124,9 @@ for epoch in range(epochs):    # 0. loop through the data
     
     model_0.eval()             # evaluation mode, sets requires_grad = False
     
+with torch.inference_mode():
+    y_preds_new = model_0(X_test)
 
+print(model_0.state_dict())
+plot_predicitons(predictions=y_preds)
+plot_predicitons(predictions=y_preds_new)
