@@ -1,6 +1,7 @@
 import torch
 from torch import nn # contains all of PyTorch's neural network building tools (Layers, Containers, Quantization, etc.)
 import matplotlib.pyplot as plt
+import numpy as np
 
 workflow_outline = {1: " --- Data (prepare and load) --- ",
                     2: " --- Build model --- ",
@@ -103,6 +104,11 @@ optimizer = torch.optim.SGD(params=model_0.parameters(),    # stocastic gradient
 
 epochs = 230       # count of loops through the data... hyperparameter
 
+# track different values to compare future experiements to past
+epoch_count = []
+loss_values = []
+test_loss_values = []
+
 for epoch in range(epochs):    # 0. loop through the data
 
     model_0.train()            # training mode for model, sets requires_grad = True
@@ -110,7 +116,6 @@ for epoch in range(epochs):    # 0. loop through the data
     
     # 2. calculate the loss
     loss = loss_fn(y_pred, y_train)# MAE or difference between model's predictions and labels (input, target)
-    print(f"Loss at {epoch} interations: {loss}")
     
     # 3. optimizer zero grad
     optimizer.zero_grad()
@@ -123,10 +128,30 @@ for epoch in range(epochs):    # 0. loop through the data
     
     
     model_0.eval()             # evaluation mode, sets requires_grad = False
-    
+    with torch.inference_mode():    # turns off gradient tracking
+        # 1. forward pass
+        test_pred = model_0(X_test)
+        
+        # 2. calculate the loss
+        test_loss = loss_fn(test_pred, y_test)
+        
+    if epoch % 10 == 0 or epoch % 229 == 0:
+        epoch_count.append(epoch)
+        loss_values.append(loss.item())
+        test_loss_values.append(test_loss.item())
+        print(f"Epoch: {epoch} | Loss: {loss:.6f} | Test loss: {test_loss:.6f}")
+
 with torch.inference_mode():
     y_preds_new = model_0(X_test)
 
 print(model_0.state_dict())
-plot_predicitons(predictions=y_preds)
-plot_predicitons(predictions=y_preds_new)
+# plot_predicitons(predictions=y_preds)   # old predictions
+# plot_predicitons(predictions=y_preds_new)   # new after training
+
+plt.plot(epoch_count, loss_values, label="Train loss")
+plt.plot(epoch_count, test_loss_values, label="Test loss")
+plt.title("training and test loss curves")
+plt.ylabel("Loss")
+plt.xlabel("Epochs")
+plt.legend()
+plt.show()
