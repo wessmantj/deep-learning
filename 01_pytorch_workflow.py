@@ -104,12 +104,24 @@ optimizer = torch.optim.SGD(params=model_0.parameters(),    # stocastic gradient
 
 epochs = 1       # count of loops through the data... hyperparameter
 
-for epoch in range(epochs):    # loop through the data
+for epoch in range(epochs):    # 0. loop through the data
 
     model_0.train()            # training mode for model, sets requires_grad = True
-    
     y_pred = model_0(X_train)  # 1. forward pass
+    
+    # 2. calculate the loss
+    loss = loss_fn(y_preds, y_train)   # MAE or difference between model's predictions and labels (input, target)
+    
+    # 3. optimizer zero grad
+    optimizer.zero_grad()
+    
+    # 4. perform backpropigation on the loss w/ respect to the params of the model
+    loss.backward()
+    
+    # 5. step the optimizer aka gradient descent
+    optimizer.step()       # how it changes will accumulate w/o zero_grad so it needs to happen above in step 3
+    
     
     model_0.eval()             # evaluation mode, sets requires_grad = False
     
-    
+
