@@ -2,6 +2,7 @@ import torch
 from torch import nn # contains all of PyTorch's neural network building tools (Layers, Containers, Quantization, etc.)
 import matplotlib.pyplot as plt
 import numpy as np
+from pathlib import Path
 
 workflow_outline = {1: " --- Data (prepare and load) --- ",
                     2: " --- Build model --- ",
@@ -154,5 +155,20 @@ plt.title("training and test loss curves")
 plt.ylabel("Loss")
 plt.xlabel("Epochs")
 plt.legend()
-plt.show()
+# plt.show()
 
+
+# 5. Saving a model
+print("\n",workflow_outline[5])
+
+# create model dir
+MODEL_PATH = Path("models")
+MODEL_PATH.mkdir(parents=True, exist_ok=True)
+
+# create model save path
+MODEL_NAME = "01_pytorch_workflow_model_0.pth"
+MODEL_SAVE_PATH = MODEL_PATH / MODEL_NAME
+
+# save the model state dict
+print(f"Saving model to: {MODEL_SAVE_PATH}")
+torch.save(obj=model_0.state_dict, f=MODEL_SAVE_PATH)

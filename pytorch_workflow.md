@@ -35,3 +35,10 @@ Use loss-function or cost-function or criterion, depending on area, measure how 
   5. Optimizer step, or using the optimizer to to adjust model's parameters to improve the loss (**gradient descent**)
 - **A testing loop**:
 
+
+Three methods for saving and loading models in PyTorch.
+
+1. `torch.save()` - allows you to save a PyTorch object in Python's pickle format
+2. `torch.load()` - allows you to load a saved PyTorch object
+3. `torch.nn.Module.load_state_dict()` - this lets you load a model's saved dictionary
+
