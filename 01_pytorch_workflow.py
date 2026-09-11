@@ -171,12 +171,11 @@ MODEL_SAVE_PATH = MODEL_PATH / MODEL_NAME
 
 # save the model state dict
 print(f"Saving model to: {MODEL_SAVE_PATH}")
-torch.save(obj=model_0.state_dict, f=MODEL_SAVE_PATH)
+torch.save(obj=model_0.state_dict(), f=MODEL_SAVE_PATH)
 
 
 
-# %% ---- HANDS-ON: one manual SGD step (predict before running each print) ----
-import torch
+# one manual SGD step (predict before running each print) 
 
 w = torch.tensor([2.0], requires_grad=True)   # a single parameter
 optimizer = torch.optim.SGD([w], lr=0.1)
@@ -187,6 +186,26 @@ optimizer.zero_grad()
 loss.backward()
 print("grad:", w.grad)   # <-- PREDICT this first
 
-# %%
 optimizer.step()
 print("w:", w)           # <-- PREDICT this before running
+
+# Loading a PyTorch model
+
+loaded_model_0 = LinearRegressionModel()
+
+loaded_model_0.load_state_dict(torch.load(f=MODEL_SAVE_PATH))
+
+print(loaded_model_0.state_dict())
+print(model_0.state_dict())   # match parameters
+
+# make some predictions of loaded vs original
+loaded_model_0.eval()
+with torch.inference_mode():
+    loaded_model_0_preds = loaded_model_0(X_test)
+
+model_0.eval()
+with torch.inference_mode():
+    y_pred = model_0(X_test)
+    
+print(f"Loaded model vs Original model: \n{y_pred == loaded_model_0_preds}")
+
