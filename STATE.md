@@ -24,9 +24,17 @@ Current: tensors → a working training loop
 
 **Session note (2026-08-27):** he's continuing the video course to finish the
 tensor-fundamentals material (reshaping/stacking/squeezing/permute/indexing) on
-his own, then returning here to be tested + have it expanded. Next session:
-probe what stuck from the course, patch gaps, then teach the storage/view model
-and the rest of the shaping toolkit before moving on to autograd.
+his own, then returning here to be tested + have it expanded.
+
+**Session note (latest):** he blew past the old edge on his own — built a full
+linear-regression training loop in `01_pytorch_workflow.py` (nn.Module, custom
+nn.Parameter, forward, L1Loss, SGD, full train loop, inference_mode, save).
+Consolidation session run on the loop. **Next milestone (his choice):** real
+data loading — Datasets/DataLoaders/batching — *then* change learning type
+(nonlinearity + classification). Still has some course left but fine leaving it.
+
+TERMINAL NOTE: keep quiz options SHORT — his terminal truncates long options
+(caused several false-miss answers early this session).
 
 ---
 
@@ -48,16 +56,18 @@ confirmed by live probing (do a short confirmation probe, not a remap).
 | Reshaping | reshape **element-count invariant** confirmed (live probe 08-27) | **storage/view model absent** — thinks reshape copies; `view`/`stack`/`squeeze`/`permute` unseen | confirmed |
 | Indexing / slicing | — | **absent** — never exercised | seeded |
 | `.cpu()` / `.numpy()` round-trips | — | **absent** | seeded |
-| autograd | — | **absent** — `requires_grad` appears once, never run | seeded |
-| `.backward()` / `.grad` | — | **absent** | seeded |
-| nn.Module / layers | — | **absent** | seeded |
-| Loss functions | — | **absent** | seeded |
-| Optimizers | — | **absent** | seeded |
-| Training loop | — | **absent** | seeded |
-| Dataset / DataLoader | — | **absent** | seeded |
+| autograd | `requires_grad`=tensor property; `inference_mode` temporarily overrides tracking (both confirmed live) | graph internals unprobed | confirmed |
+| `.backward()` / `.grad` | `.grad` holds ∂loss/∂p; backward ACCUMULATES (both confirmed) | — solid | confirmed |
+| nn.Module / layers | built subclass, custom nn.Parameter, forward; `train/eval`=mode flag (fixed this session) | only ever hand-written linear; `nn.Linear`/dropout/batchnorm unseen | confirmed |
+| Loss functions | uses `nn.L1Loss` in a working loop | why/which loss when — unprobed | seeded |
+| Optimizers | `SGD` wired correctly; NOW knows update rule `p←p-lr·grad` (taught, fragile) | momentum/Adam/other optimizers absent | confirmed |
+| Training loop | can build+run full loop AND now explains why each line/order | independent recall of chain unconfirmed; only 1 model type | confirmed |
+| Dataset / DataLoader | — | **absent** — NEXT MILESTONE | seeded |
 
-**The edge, in one line:** *can manipulate tensors fluently; has never built
-anything that learns.* Teaching starts at autograd.
+**The edge, in one line:** *builds & now understands a full linear-regression
+training loop; has never fed it real data.* Teaching starts at Datasets/DataLoaders.
+Also: `torch.save` bug in his code — passed `model_0.state_dict` (method) not
+`state_dict()` (call); flagged, not yet fixed by him.
 
 ---
 
@@ -65,7 +75,8 @@ anything that learns.* Teaching starts at autograd.
 
 Log as: `- [date] <belief> — dislodged | STILL LIVE — <note>`.
 
-- [2026-08-27] "reshape returns an independent copy of the data" — **STILL LIVE** — missed on live probe; no concept yet that a tensor = flat storage + shape/stride metadata, so reshape/view usually *share* storage. Teach this first next session.
+- [2026-08-27] "reshape returns an independent copy of the data" — **STILL LIVE** — missed on live probe; no concept yet that a tensor = flat storage + shape/stride metadata, so reshape/view usually *share* storage. Not revisited this session.
+- [latest] "model.train()/eval() toggle requires_grad / gradient tracking" (was written into his code comments) — **DISLODGED** this session. Confirmed he now knows they only flip self.training for dropout/batchnorm, are no-ops in his linear model, and that grad tracking is requires_grad + inference_mode/no_grad. Recheck once next session.
 
 ---
 
@@ -73,7 +84,9 @@ Log as: `- [date] <belief> — dislodged | STILL LIVE — <note>`.
 
 Log as: `- [date] <node> — landed? held on recheck [date]? | needs rebuild`.
 
-_(none yet — first teaching session pending)_
+- [latest] train()/eval() = mode flag, not grad tracking — landed (dislodged prior misconception). due recheck ~+3d
+- [latest] SGD update rule `p ← p - lr·∂loss/∂p`; step size scales with gradient magnitude — landed after a struggle, THEN confirmed solid via hands-on prediction on real optimizer (predicted grad=4.0 and post-step w=1.6 correctly). due recheck +3d.
+- [latest] full loop as causal chain + WHY the order — confirmed via hands-on: correctly predicted that skipping zero_grad makes backward accumulate 4.0→8.0 (united accumulation node with update-rule node). solid. due recheck +3d.
 
 ---
 
@@ -83,4 +96,6 @@ For computing intervals, not guessing. A node that **held** lengthens its
 interval (e.g. 1d → 3d → 7d → 16d → 35d); a node that **needed rebuilding**
 resets to ~1d. Log as: `- <node> — last reviewed <date>, held ×N, due <date>`.
 
-_(empty — populates once teaching begins)_
+- train/eval mode flag — last reviewed [latest], held ×1, due +3d
+- SGD update rule — last reviewed [latest], held ×1 (confirmed via hands-on), due +3d
+- full-loop chain — last reviewed [latest], held ×1 (confirmed via hands-on), due +3d

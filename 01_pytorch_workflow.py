@@ -172,3 +172,21 @@ MODEL_SAVE_PATH = MODEL_PATH / MODEL_NAME
 # save the model state dict
 print(f"Saving model to: {MODEL_SAVE_PATH}")
 torch.save(obj=model_0.state_dict, f=MODEL_SAVE_PATH)
+
+
+
+# %% ---- HANDS-ON: one manual SGD step (predict before running each print) ----
+import torch
+
+w = torch.tensor([2.0], requires_grad=True)   # a single parameter
+optimizer = torch.optim.SGD([w], lr=0.1)
+
+loss = w ** 2          # our "loss" as a function of w
+
+optimizer.zero_grad()
+loss.backward()
+print("grad:", w.grad)   # <-- PREDICT this first
+
+# %%
+optimizer.step()
+print("w:", w)           # <-- PREDICT this before running
