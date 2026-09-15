@@ -1,3 +1,5 @@
+from typing import Any
+
 import torch
 from torch import nn # contains all of PyTorch's neural network building tools (Layers, Containers, Quantization, etc.)
 import matplotlib.pyplot as plt
@@ -312,6 +314,107 @@ for epoch in range(epochs):
         print(f"Epoch: {epoch} | Loss: {loss:.6f} | Test loss: {test_loss:.6f}")
     
 
-plot_predicitons(predictions=test_pred.cpu())
+# plot_predicitons(predictions=test_pred.cpu())
 
-# Saving & Loading a Trained Model 
+
+# Exercises for Part 2
+print("---------------------------------------------")
+
+# create a straight line dataset using the linear regression formula
+start = 0
+end = 10
+step = 0.1
+
+X = torch.arange(start, end, step).unsqueeze(dim=1)
+
+# set weight and bias to 0.3 and 0.8
+weight, bias = 0.3, 0.9
+y = weight * X + bias
+
+# split the data into 80% training and 20% testing
+training_split = int(0.8 * len(X))
+X_train, y_train = X[:training_split], y[:training_split]
+X_test, y_test = X[training_split:], y[training_split:]
+
+# plot training data (default args used above)
+plot_predicitons(X_train, y_train, X_test, y_test)
+
+# build a PyTorch model by subclassing nn.Module
+class ExerciseLinearModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.weights = nn.Parameter(torch.randn(1,
+                                    requires_grad=True,     
+                                    dtype=torch.float32)) # random nn.Parameter w/ requires_grad = True
+        self.bias = nn.Parameter(torch.randn(1,
+                                requires_grad=True,
+                                dtype=torch.float32)) # one for both
+    
+    # impliment the forward() method to compute th elinear regression function you used to create the dataset in 1
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.weights * x + self.bias
+
+# instanciate model and check state dict
+model_exercise = ExerciseLinearModel()
+print(f"Exercise Model State Dict: \n{model_exercise.state_dict()}")
+
+# create a loss function and optimizer
+loss_fn = nn.L1Loss()
+optimizer = torch.optim.SGD(params=model_exercise.parameters(),
+                            lr=0.01)
+
+# write a training loop to perform the appropriate training steps for 300 epochs
+epochs = 300
+
+for epoch in range(epochs):
+    model_exercise.train()
+    
+    y_pred = model_exercise(X_train)
+    
+    loss = loss_fn(y_pred, y_train)
+    
+    optimizer.zero_grad()
+    
+    loss.backward()
+    
+    optimizer.step()
+    
+    if epoch % 20 == 0:
+        model_exercise.eval()
+        with torch.inference_mode():
+            test_pred = model_exercise(X_test)
+            test_loss = loss_fn(test_pred, y_test)
+            print(f"Epoch: {epoch} | Loss: {loss:.6f} | Test loss: {test_loss:.6f}")
+            
+print(model_exercise.state_dict())
+
+model_exercise.eval()
+with torch.inference_mode():
+    y_preds_new = model_exercise(X_test)
+    
+plot_predicitons(train_data=X_train, train_labels=y_train,
+                 test_data=X_test, test_labels=y_test, predictions=y_preds_new)
+
+# save the trained model's state dict to file
+MODEL_NAME = "01_pytorch_workflow_exercise_model.pth"
+MODEL_SAVE_PATH = MODEL_PATH / MODEL_NAME
+
+print(f"Saving model to: {MODEL_SAVE_PATH}")
+torch.save(obj=model_exercise.state_dict(), f=MODEL_SAVE_PATH)
+
+# create a new instance of the model and load in the saved state dict
+loaded_model_exercise = ExerciseLinearModel()
+
+loaded_model_exercise.load_state_dict(torch.load(f=MODEL_SAVE_PATH))
+
+print(loaded_model_exercise.state_dict())
+print(model_exercise.state_dict())   # match parameters
+
+# make predictions with the loaded model and confirm they match the original
+loaded_model_exercise.eval()
+with torch.inference_mode():
+    loaded_model_exercise_preds = loaded_model_exercise(X_test)
+
+print(f"Loaded model vs Original model: \n{y_preds_new == loaded_model_exercise_preds}")
+
+
