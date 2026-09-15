@@ -209,3 +209,56 @@ with torch.inference_mode():
     
 print(f"Loaded model vs Original model: \n{y_pred == loaded_model_0_preds}")
 
+# FULL WORKFLOW DONE BELOW
+
+print("\n",workflow_outline[6])
+
+# 6.1 Data
+
+if torch.cuda.is_available():
+    device = "cuda"          # NVIDIA GPU 
+elif torch.backends.mps.is_available():
+    device = "mps"           # Apple Silicon GPU
+else:
+    device = "cpu"           # fallback
+print(f"\nUsing device: {device}")
+
+# create some data using linear regression formula of y = weight * (feat + bias)
+
+weight, bias = 0.2, 0.8
+print(f"\nWeight: {weight} \nBias: {bias}")
+
+# create range values
+start = 0
+end = 1
+step = 0.02
+print(f"\nRange: {start} -> {end} \nStep Distance: {step}")
+
+# create X and y (features and labels)
+X = torch.arange(start, end, step).unsqueeze(dim=1)
+y = weight * X + bias
+print(f"\nFeatures: X={len(X)} \nLabels: y={len(y)}")
+
+# split data
+training_split = int(0.8 * len(X))
+X_train, y_train = X[:training_split], y[:training_split]
+X_test, y_test = X[training_split:], y[training_split:]
+print(f"\nX_train: {len(X_train)} \ny_train: {len(y_train)} \nX_test: {len(X_test)} \ny_test: {len(y_test)}")
+
+# 6.2 Building a PyTorch linear model
+
+class LinearRegressionModelV2(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # use nn.Linear()
+        self.linear_layer = nn.Linear(in_features=1,
+                                      out_features=1) # within this one layer, an input x is one value, outputs y at one value
+    
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.linear_layer(x)
+    
+# set the manual seed and make model istance
+torch.manual_seed(42)
+model_1 = LinearRegressionModelV2()
+print(f"\nmodel_1: {model_1} \nmodel_1: {model_1.state_dict()}")
+
