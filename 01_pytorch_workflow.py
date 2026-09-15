@@ -213,7 +213,7 @@ print(f"Loaded model vs Original model: \n{y_pred == loaded_model_0_preds}")
 
 print("\n",workflow_outline[6])
 
-# 6.1 Data
+# Data
 
 if torch.cuda.is_available():
     device = "cuda"          # NVIDIA GPU 
@@ -225,7 +225,7 @@ print(f"\nUsing device: {device}")
 
 # create some data using linear regression formula of y = weight * (feat + bias)
 
-weight, bias = 0.2, 0.8
+weight, bias = 0.7, 0.3
 print(f"\nWeight: {weight} \nBias: {bias}")
 
 # create range values
@@ -245,7 +245,7 @@ X_train, y_train = X[:training_split], y[:training_split]
 X_test, y_test = X[training_split:], y[training_split:]
 print(f"\nX_train: {len(X_train)} \ny_train: {len(y_train)} \nX_test: {len(X_test)} \ny_test: {len(y_test)}")
 
-# 6.2 Building a PyTorch linear model
+# Building a PyTorch linear model
 
 class LinearRegressionModelV2(nn.Module):
     def __init__(self):
@@ -260,5 +260,58 @@ class LinearRegressionModelV2(nn.Module):
 # set the manual seed and make model istance
 torch.manual_seed(42)
 model_1 = LinearRegressionModelV2()
-print(f"\nmodel_1: {model_1} \nmodel_1: {model_1.state_dict()}")
+model_1.to(device="mps")
+print(f"\nmodel_1: {model_1} \nmodel_1 dict: {model_1.state_dict()}")
 
+# Training & Testing
+
+# setup loss function
+loss_fn = nn.L1Loss() # same as MAE
+
+# set up optimizer
+optimizer = torch.optim.SGD(params=model_1.parameters(),
+                            lr=0.01)
+
+# writing training loop
+torch.manual_seed(42)
+epochs = 116
+
+# put data on target device
+X_train = X_train.to(device)
+y_train = y_train.to(device)
+X_test = X_test.to(device)
+y_test = y_test.to(device)
+
+for epoch in range(epochs):
+    # set to training mode
+    model_1.train()
+    
+    # do the forward pass
+    y_pred = model_1(X_train)
+    
+    # calculate the loss
+    loss = loss_fn(y_pred, y_train)
+    
+    # zero the optimizer
+    optimizer.zero_grad()
+    
+    # perform backpropagation
+    loss.backward()
+    
+    # optimizer step
+    optimizer.step()
+
+    # Testing
+    
+    model_1.eval()
+    with torch.inference_mode():
+        test_pred = model_1(X_test)
+        test_loss = loss_fn(test_pred, y_test)
+
+    if epoch % 5 == 0:
+        print(f"Epoch: {epoch} | Loss: {loss:.6f} | Test loss: {test_loss:.6f}")
+    
+
+plot_predicitons(predictions=test_pred.cpu())
+
+# Saving & Loading a Trained Model 
