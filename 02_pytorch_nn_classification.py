@@ -1,3 +1,11 @@
+"""
+02 - PyTorch Neural Network Classification
+
+Ran locally on Apple Silicon using the MPS (GPU) backend.
+
+Companion notes: 02_pytorch_nn_classification.md
+"""
+
 from typing import Any
 
 import sklearn
@@ -57,7 +65,7 @@ X_train, X_test, y_train, y_test = train_test_split(X,
 
 print(f"\nTotal samples: {n_samples} \nX_train samples: {len(X_train)} \nX_test samples: {len(X_test)} \ny_train samples: {len(y_train)}  \ny_test samples: {len(y_test)}")  # 80/20 split
 
-# Building a model to classify blue an red dots
+# Building a model to classify blue and red dots
 
 # device agnostic 
 if torch.cuda.is_available():

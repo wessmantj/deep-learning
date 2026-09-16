@@ -1,3 +1,11 @@
+"""
+01 - PyTorch Workflow
+
+Ran locally on Apple Silicon using the MPS (GPU) backend.
+
+Companion notes: 01_pytorch_workflow.md
+"""
+
 from typing import Any
 
 import torch

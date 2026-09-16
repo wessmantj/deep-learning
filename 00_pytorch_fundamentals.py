@@ -3,7 +3,7 @@
 
 Ran locally on Apple Silicon using the MPS (GPU) backend.
 
-Companion notes: pytorch-fundamentals.md
+Companion notes: 00_pytorch_fundamentals.md
 """
 
 import torch

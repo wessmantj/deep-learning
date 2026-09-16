@@ -11,6 +11,8 @@ Companion code: [`00_pytorch_fundamentals.py`](./00_pytorch_fundamentals.py)
 - [Random tensors](#random-tensors)
 - [Getting information from tensors](#getting-information-from-tensors)
 - [Tensor operations](#tensor-operations)
+- [How to change shape of tensors](#how-to-change-shape-of-tensors)
+- [Reproducibility](#reproducibility)
 
 ---
 
@@ -109,14 +111,13 @@ Tensor operations include:
 ## How to change shape of tensors
 
 - Reshaping - reshapes an input tensor to a defined shape
-- View - return a view of an input tesnor of certain shape, but keeps the same memory as original
-- Stacking - combine multiple tensors on top of eachother; vertical (vstack) and horizontal (hstack), in pytorc.stack you can define which dimension 
-- Squeeze - removes all `1` dimension from a tensor
+- View - return a view of an input tensor of certain shape, but keeps the same memory as the original
+- Stacking - combine multiple tensors on top of each other; vertical (vstack) and horizontal (hstack), and in `torch.stack` you can define which dimension
+- Squeeze - removes all `1` dimensions from a tensor
 - Unsqueeze - add a `1` dimension to a target tensor
-- Permute - return a view of the inputs with dimesnion permuted (swapped) in a certain way
- 
+- Permute - return a view of the input with dimensions permuted (swapped) in a certain way
 
-# Reproducibility 
+## Reproducibility
 
 Neural networks learn starting with random numbers and through billions of tensor operations, they begin to better represent the data being passed in. To reduce randomness,
-say to repeat testing, you will used a random seed. 
+say to repeat testing, you will use a random seed.
