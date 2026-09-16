@@ -1,0 +1,97 @@
+from typing import Any
+
+import sklearn
+from sklearn.datasets import make_circles
+from sklearn.model_selection import train_test_split
+import pandas as pd
+import matplotlib.pyplot as plt
+import torch
+from torch import nn
+
+# Make classification data and get ready
+n_samples = 1000
+
+# create circles
+X, y = make_circles(n_samples,
+                    noise=0.03,
+                    random_state=42)    # random seed
+
+print(f"X length: {len(X)} \ny length: {len(y)}")
+print(f"\nFirst 5 samples of X: \n{X[:5]}")
+print(f"First 5 samples of y: \n{y[:5]}") # 0 or 1; binary classification
+
+# make a DataFrame of circle data
+circles = pd.DataFrame({"X1" : X[:, 0],
+                        "X2" : X[:, 1],
+                        "label" : y})
+
+print("\n", circles.head(10))
+
+# visualize
+plt.scatter(x=X[:, 0],
+            y=X[:, 1],
+            c=y,
+            cmap=plt.cm.RdYlBu)
+
+# plt.show()  # shows two circles, given an input we are trying to have it predict if it will be on the red area or blue area (seperating the two)
+
+# Check input and output shapes
+print(f"X.shape: {X.shape} \ny.shape: {y.shape}")
+
+# view the first example of features and labels
+X_sample = X[0]
+y_sample = y[0]
+
+print(f"Values for one same of X: {X_sample} and the same for y: {y_sample}")
+print(f"Shapes for one sample of X: {X_sample.shape} and the same for y: {y_sample.shape}")
+
+# Turn data into tensors and create train and test splits
+
+X = torch.from_numpy(X).type(torch.float32) # turned to tensor
+y = torch.from_numpy(y).type(torch.float) # turned to tensor
+
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    y,
+                                                    test_size=0.2,  # 0.2 = 20% of data will be test, 80% will be train
+                                                    random_state=42)    # random seed
+
+print(f"\nTotal samples: {n_samples} \nX_train samples: {len(X_train)} \nX_test samples: {len(X_test)} \ny_train samples: {len(y_train)}  \ny_test samples: {len(y_test)}")  # 80/20 split
+
+# Building a model to classify blue an red dots
+
+# device agnostic 
+if torch.cuda.is_available():
+    device = "cuda"          # NVIDIA GPU 
+elif torch.backends.mps.is_available():
+    device = "mps"           # Apple Silicon GPU
+else:
+    device = "cpu"           # fallback
+print(f"\nUsing device: {device}")
+
+
+
+class CircleModelV0(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        
+        # create two layers capable of handling shapes of data
+        self.layer_1 = nn.Linear(in_features=2,
+                                 out_features=5)    # takes in two features and upscales to 5 (or x) features
+        
+        self.layer_2 = nn.Linear(in_features=5,
+                                 out_features=1)    # takes in 5 features from prev layer and outputs single feature
+    
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.layer_2(self.layer_1(x))
+    
+model_0 = CircleModelV0().to(device)
+
+model_0 = nn.Sequential(
+    nn.Linear(in_features=2, out_features=5),
+    nn.Linear(in_features=5, out_features=1)
+).to(device)
+
+print(model_0)  # Same model as before, sequences layers and makes forward method for us. Good for quick test but when there are more complex operations and forward pass, its secondary to subclassing
+
+
+
