@@ -99,7 +99,22 @@ model_0 = nn.Sequential(
     nn.Linear(in_features=5, out_features=1)
 ).to(device)
 
-print(model_0)  # Same model as before, sequences layers and makes forward method for us. Good for quick test but when there are more complex operations and forward pass, its secondary to subclassing
+print(model_0)  # Same model as before, sequences layers and makes forward method for us in descending order. Good for quick test but when there are more complex operations and forward pass, its secondary to subclassing nn.Module.
 
+# Make predictions
+with torch.inference_mode():
+    untrained_preds = model_0(X_test.to(device))
+print(f"Length preds: {len(untrained_preds)} \nShape preds: {untrained_preds.shape}")
+print(f"Length test samples: {len(X_test)} \nShape test: {X_test.shape}")
 
+loss_fn = torch.nn.BCEWithLogitsLoss()  # BCEWithLogitsLoss = signmoid activation function built-in
+optimizer = torch.optim.SGD(params=model_0.parameters(),
+                            lr=0.1)
+
+# Calculate accuracy - so out of 100 examples, what percentage does our model get right?
+def accuracy_fn(y_true, y_pred):
+    correct = torch.eq(y_true, y_pred).sum().item()
+    acc = (correct/len(y_pred) * 100)
+    
+    return acc
 
