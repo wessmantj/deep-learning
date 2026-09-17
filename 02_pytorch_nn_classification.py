@@ -99,7 +99,7 @@ model_0 = nn.Sequential(
     nn.Linear(in_features=5, out_features=1)
 ).to(device)
 
-print(model_0)  # Same model as before, sequences layers and makes forward method for us in descending order. Good for quick test but when there are more complex operations and forward pass, its secondary to subclassing nn.Module.
+print(model_0.state_dict())  # Same model as before, sequences layers and makes forward method for us in descending order. Good for quick test but when there are more complex operations and forward pass, its secondary to subclassing nn.Module.
 
 # Make predictions
 with torch.inference_mode():
@@ -118,3 +118,38 @@ def accuracy_fn(y_true, y_pred):
     
     return acc
 
+
+# Train model
+
+X_train = X_train.to(device)
+y_train = y_train.to(device)
+X_test = X_test.to(device)
+y_test = y_test.to(device)
+
+epochs = 100
+
+for epoch in range(epochs):
+    model_0.train()
+    
+    y_logits = model_0(X_train).squeeze()
+    y_pred = torch.round(torch.sigmoid(y_logits)) # turn logits -> pred probs -> pred labels
+    loss = loss_fn(y_logits, y_train)
+    
+    acc = accuracy_fn(y_true=y_train,
+                      y_pred=y_pred)
+    
+    optimizer.zero_grad()
+    
+    loss.backward()
+    
+    optimizer.step()    
+
+    if epoch % 5 == 0:
+        model_0.eval()
+        with torch.inference_mode():
+            test_logits = model_0(X_test).squeeze()
+            test_pred = torch.round(torch.sigmoid(test_logits))
+            test_loss = loss_fn(test_logits, y_test)
+            test_acc = accuracy_fn(y_true=y_test,
+                                   y_pred=test_pred)
+            print(f"EPOCH: {epoch} | LOSS: {loss:.6f} | TEST LOSS: {test_loss:.6f} | TEST ACC: {test_acc}")
