@@ -126,7 +126,7 @@ y_train = y_train.to(device)
 X_test = X_test.to(device)
 y_test = y_test.to(device)
 
-epochs = 100
+epochs = 200
 
 for epoch in range(epochs):
     model_0.train()
@@ -152,4 +152,4 @@ for epoch in range(epochs):
             test_loss = loss_fn(test_logits, y_test)
             test_acc = accuracy_fn(y_true=y_test,
                                    y_pred=test_pred)
-            print(f"EPOCH: {epoch} | LOSS: {loss:.6f} | TEST LOSS: {test_loss:.6f} | TEST ACC: {test_acc}")
+            print(f"EPOCH: {epoch} | LOSS: {loss:.6f} | TEST LOSS: {test_loss:.6f} | TEST ACC: {test_acc:.6f}")
