@@ -15,6 +15,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import torch
 from torch import nn
+import requests
+import numpy as np 
+from pathlib import Path
 
 # Make classification data and get ready
 n_samples = 1000
@@ -126,7 +129,7 @@ y_train = y_train.to(device)
 X_test = X_test.to(device)
 y_test = y_test.to(device)
 
-epochs = 200
+epochs = 201
 
 for epoch in range(epochs):
     model_0.train()
@@ -144,12 +147,37 @@ for epoch in range(epochs):
     
     optimizer.step()    
 
-    if epoch % 5 == 0:
-        model_0.eval()
-        with torch.inference_mode():
-            test_logits = model_0(X_test).squeeze()
-            test_pred = torch.round(torch.sigmoid(test_logits))
-            test_loss = loss_fn(test_logits, y_test)
-            test_acc = accuracy_fn(y_true=y_test,
-                                   y_pred=test_pred)
-            print(f"EPOCH: {epoch} | LOSS: {loss:.6f} | TEST LOSS: {test_loss:.6f} | TEST ACC: {test_acc:.6f}")
+
+    model_0.eval()
+    with torch.inference_mode():
+        test_logits = model_0(X_test).squeeze()
+        test_pred = torch.round(torch.sigmoid(test_logits))
+        test_loss = loss_fn(test_logits, y_test)
+        test_acc = accuracy_fn(y_true=y_test,
+                                y_pred=test_pred)
+            
+    if epoch % 10 == 0:
+        print(f"EPOCH: {epoch} | LOSS: {loss:.6f} | TEST LOSS: {test_loss:.6f} | TEST ACC: {test_acc:.2f}")
+            
+# Make predictions and evaluate why model isn't learning
+    
+if Path("helper_functions.py").is_file():
+    print("helper_functions.py already exists, skipping download.")
+else:
+    print("Downloading helper_functions.py")
+    request = requests.get("https://raw.githubusercontent.com/mrdbourke/pytorch-deep-learning/refs/heads/main/helper_functions.py")
+    with open("helper_functions.py", "wb") as f:
+        f.write(request.content)
+        
+from helper_functions import plot_predictions, plot_decision_boundary
+
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 2, 1)
+plt.title("Train")
+plot_decision_boundary(model_0, X_train, y_train)
+plt.subplot(1, 2, 2)
+plt.title("Test")
+plot_decision_boundary(model_0, X_test, y_test)
+plt.show()  # linear layer is trying to split the whole dataset in half since two classes, red or blue
+
+# Improving the model

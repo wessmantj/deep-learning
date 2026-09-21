@@ -29,4 +29,11 @@ Companion code: [`02_pytorch_nn_classification.py`](./02_pytorch_nn_classificati
 - **Loss function:** Binary cross entropy for binary and cross entropy for multiclass.
 - **Optimizer:** SGD (stochastic gradient descent) or Adam for both binary and multiclass, but many others exist.
 
-## 
+## How to Improve a Model
+- **Add more layers:** Give the model more chances to learn about patterns in the data, potential improvement.
+- **Add more hidden units:** Go from 5 hidden units to 10 hidden units
+- **Fit for longer:** Give it more time/epochs
+- **Change the learning rate:** If its too small or high the model will not perform well
+
+
+
