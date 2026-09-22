@@ -178,6 +178,63 @@ plot_decision_boundary(model_0, X_train, y_train)
 plt.subplot(1, 2, 2)
 plt.title("Test")
 plot_decision_boundary(model_0, X_test, y_test)
-plt.show()  # linear layer is trying to split the whole dataset in half since two classes, red or blue
+# plt.show()  # linear layer is trying to split the whole dataset in half since two classes, red or blue
 
 # Improving the model
+class CircleModelV1(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+    
+        self.layer_1 = nn.Linear(in_features=2,
+                                 out_features=10)
+        self.layer_2 = nn.Linear(in_features=10,
+                                 out_features=10)
+        self.layer_3 = nn.Linear(in_features=10,
+                                 out_features=1)
+    
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # z = self.layer_1(x)
+        # z = self.layer_2(z)
+        #z = self.layer_3(z)
+        return self.layer_3(self.layer_2(self.layer_1(x)))
+    
+model_1 = CircleModelV1().to(device)
+    
+loss_fn = nn.BCEWithLogitsLoss()
+optimizer = torch.optim.SGD(params=model_1.parameters(),
+                                 lr=0.01)
+    
+torch.manual_seed(42)
+torch.mps.manual_seed(42)
+    
+epochs = 1001   
+    
+X_train, y_train = X_train.to(device), y_train.to(device)
+X_test, y_test = X_test.to(device), y_test.to(device)
+    
+for epoch in range(epochs):
+    model_1.train()
+        
+    y_logits = model_1(X_train).squeeze()
+    y_pred = torch.round(torch.sigmoid(y_logits)) # logits -> pred probabilities -> prediction labels
+        
+    loss = loss_fn(y_logits, y_train)
+    acc = accuracy_fn(y_true=y_train, y_pred=y_pred)
+
+    optimizer.zero_grad()
+    loss.backward()
+        
+    optimizer.step()
+        
+        
+    model_1.eval()
+    with torch.inference_mode():
+        test_logits = model_1(X_test).squeeze()
+        test_pred = torch.round(torch.sigmoid(test_logits))
+            
+        test_loss = loss_fn(test_logits, y_test)
+        test_acc = accuracy_fn(y_true=y_test,
+                                   y_pred=test_pred)
+            
+    if epoch % 50 == 0:
+        print(f"EPOCH: {epoch} | LOSS: {loss:.6f} | TEST LOSS: {test_loss:.6f} | TEST ACC: {test_acc:.2f}")
