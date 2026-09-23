@@ -238,3 +238,149 @@ for epoch in range(epochs):
             
     if epoch % 50 == 0:
         print(f"EPOCH: {epoch} | LOSS: {loss:.6f} | TEST LOSS: {test_loss:.6f} | TEST ACC: {test_acc:.2f}")
+
+# Create some data 
+
+weight = 0.7
+bias = 0.3
+start = 0
+end = 1
+step = 0.01
+
+X_regression = torch.arange(start, end, step).unsqueeze(dim=1)
+y_regression = weight * X_regression + bias
+
+training_split = int(0.8 * len(X_regression))
+X_train_regression, y_train_regression = X_regression[:training_split], y_regression[:training_split]
+X_test_regression, y_test_regression = X_regression[training_split:], y_regression[training_split:]
+# 80, 20 split for both
+
+plot_predictions(train_data=X_train_regression,
+                 train_labels=y_train_regression,
+                 test_data=X_test_regression,
+                 test_labels=y_test_regression)
+# plt.show()
+
+# Adjusting `model_1` to fit a straight line
+
+# Model 2 w/ same architecture as model_1 but using nn.Sequential()
+model_2 = nn.Sequential(
+    nn.Linear(in_features=1, out_features=10),
+    nn.Linear(in_features=10, out_features=10),
+    nn.Linear(in_features=10, out_features=1)
+).to(device)
+
+loss_fn = nn.L1Loss()
+optimizer = torch.optim.SGD(params=model_2.parameters(), lr= 0.01)
+
+# Train the model
+torch.manual_seed(42)
+torch.mps.manual_seed(42)
+
+epochs = 1000
+X_train_regression, y_train_regression = X_train_regression.to(device), y_train_regression.to(device)
+X_test_regression, y_test_regression = X_test_regression.to(device), y_test_regression.to(device)
+
+for epoch in range(epochs):
+    model_2.train()
+    
+    y_pred = model_2(X_train_regression)
+    loss = loss_fn(y_pred, y_train_regression)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+    
+    
+    # Training
+    model_2.eval()
+    with torch.inference_mode():
+        test_pred = model_2(X_test_regression)
+        test_loss = loss_fn(test_pred, y_test_regression)
+        
+    if epoch % 50 == 0:
+            print(f"EPOCH: {epoch} | LOSS: {loss:.6f} | TEST LOSS: {test_loss:.6f}")
+            
+
+model_2.eval()
+with torch.inference_mode():
+    y_preds = model_2(X_test_regression)
+    
+plot_predictions(train_data=X_train_regression.cpu(),
+                 train_labels=y_train_regression.cpu(),
+                 test_data=X_test_regression.cpu(),
+                 test_labels=y_test_regression.cpu(),
+                 predictions=y_preds.cpu())
+# plt.show()
+
+# Make and plot data
+n_samples = 1000
+X, y = make_circles(n_samples,
+                    noise=0.03,
+                    random_state=42)
+
+plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.RdBu)
+# plt.show()
+
+# Convert data to tensors and then train and test splits
+X = torch.from_numpy(X).type(torch.float32)
+y = torch.from_numpy(y).type(torch.float) 
+
+X_train, X_test, y_train, y_test = train_test_split(X,
+                                                    y,
+                                                    test_size=0.2,  
+                                                    random_state=42) # device agnostic
+
+# Make a non-linear model
+class CircleModelV2(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.layer_1 = nn.Linear(in_features=2, out_features=10)
+        self.layer_2 = nn.Linear(in_features=10, out_features=2)
+        self.layer_3 = nn.Linear(in_features=10, out_features=1)
+        self.relu = nn.ReLU()
+        
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.layer_3(self.relu(self.layer_2(self.relu(self.layer_1(x)))))
+
+model_3 = CircleModelV2().to(device)
+    
+ 
+# Setup loss and optimizer
+loss_fn = nn.BCEWithLogitsLoss()
+optimizer = torch.optim.SGD(params=model_3.parameters(), lr=0.01)
+
+# Random seeds
+torch.manual_seed(42)
+torch.mps.manual_seed(42)
+
+X_train = X_train.to(device)
+y_train = y_train.to(device)
+X_test = X_test.to(device)
+y_test = y_test.to(device)
+
+epochs = 1000
+
+for epoch in range(epoch):
+    model_3.train()
+
+    y_logits = model_3(X_train).squeeze()
+    y_pred = torch.round(torch.sigmoid(y_logits))
+    
+    loss = loss_fn(y_logits, y_train)
+    acc = accuracy_fn(y_true=y_train, y_pred=y_pred)
+    
+    optimizer.zero_grad()
+    
+    loss.backward()
+    
+    optimizer.step()
+    
+    # test
+    model_3.eval()
+    with torch.inference_mode():
+        test_logits = model_3(X_test).squeeze()
+        test_pred = torch.round(torch.sigmoid(test_logits))
+        test_loss = loss_fn(test_logits, y_test)
+        test_acc = accuracy_fn(y_true=y_test,
+                                y_pred=test_pred)
+    
