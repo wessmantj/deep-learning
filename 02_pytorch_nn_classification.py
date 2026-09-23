@@ -39,6 +39,7 @@ circles = pd.DataFrame({"X1" : X[:, 0],
 print("\n", circles.head(10))
 
 # visualize
+
 plt.scatter(x=X[:, 0],
             y=X[:, 1],
             c=y,
@@ -178,6 +179,7 @@ plot_decision_boundary(model_0, X_train, y_train)
 plt.subplot(1, 2, 2)
 plt.title("Test")
 plot_decision_boundary(model_0, X_test, y_test)
+
 # plt.show()  # linear layer is trying to split the whole dataset in half since two classes, red or blue
 
 # Improving the model
@@ -255,10 +257,12 @@ X_train_regression, y_train_regression = X_regression[:training_split], y_regres
 X_test_regression, y_test_regression = X_regression[training_split:], y_regression[training_split:]
 # 80, 20 split for both
 
+
 plot_predictions(train_data=X_train_regression,
                  train_labels=y_train_regression,
                  test_data=X_test_regression,
                  test_labels=y_test_regression)
+
 # plt.show()
 
 # Adjusting `model_1` to fit a straight line
@@ -305,11 +309,13 @@ model_2.eval()
 with torch.inference_mode():
     y_preds = model_2(X_test_regression)
     
+    
 plot_predictions(train_data=X_train_regression.cpu(),
                  train_labels=y_train_regression.cpu(),
                  test_data=X_test_regression.cpu(),
                  test_labels=y_test_regression.cpu(),
                  predictions=y_preds.cpu())
+
 # plt.show()
 
 # Make and plot data
@@ -318,7 +324,7 @@ X, y = make_circles(n_samples,
                     noise=0.03,
                     random_state=42)
 
-plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.RdBu)
+# plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.RdBu)
 # plt.show()
 
 # Convert data to tensors and then train and test splits
@@ -335,19 +341,21 @@ class CircleModelV2(nn.Module):
     def __init__(self) -> None:
         super().__init__()
         self.layer_1 = nn.Linear(in_features=2, out_features=10)
-        self.layer_2 = nn.Linear(in_features=10, out_features=2)
-        self.layer_3 = nn.Linear(in_features=10, out_features=1)
+        self.layer_2 = nn.Linear(in_features=10, out_features=10)
+        self.layer_3 = nn.Linear(in_features=10, out_features=10)
+        self.layer_4 = nn.Linear(in_features=10, out_features=1)
+        
         self.relu = nn.ReLU()
         
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.layer_3(self.relu(self.layer_2(self.relu(self.layer_1(x)))))
+        return self.layer_4(self.relu(self.layer_3(self.relu(self.layer_2(self.relu(self.layer_1(x)))))))
 
 model_3 = CircleModelV2().to(device)
     
  
 # Setup loss and optimizer
 loss_fn = nn.BCEWithLogitsLoss()
-optimizer = torch.optim.SGD(params=model_3.parameters(), lr=0.01)
+optimizer = torch.optim.SGD(params=model_3.parameters(), lr=0.1)
 
 # Random seeds
 torch.manual_seed(42)
@@ -358,9 +366,9 @@ y_train = y_train.to(device)
 X_test = X_test.to(device)
 y_test = y_test.to(device)
 
-epochs = 1000
+epochs = 2501
 
-for epoch in range(epoch):
+for epoch in range(epochs):
     model_3.train()
 
     y_logits = model_3(X_train).squeeze()
@@ -384,3 +392,24 @@ for epoch in range(epoch):
         test_acc = accuracy_fn(y_true=y_test,
                                 y_pred=test_pred)
     
+    if epoch % 100 == 0:
+        print(f"EPOCH: {epoch} | LOSS: {loss:.6f} | TEST LOSS: {test_loss:.6f} | TEST ACC: {test_acc:.2f}")
+ 
+ 
+model_3.eval()
+with torch.inference_mode():
+    y_preds = torch.round(torch.sigmoid(model_3(X_test)).squeeze())
+    
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 2, 1)
+plt.title("Train")
+plot_decision_boundary(model=model_3,
+                       X=X_train,
+                       y=y_train)
+plt.subplot(1, 2, 2)
+plt.title("Test")
+plot_decision_boundary(model=model_3,
+                       X=X_test,
+                       y=y_test)
+plt.show()
+# improved with more epochs
