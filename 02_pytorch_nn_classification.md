@@ -34,5 +34,5 @@ Companion code: [`02_pytorch_nn_classification.py`](./02_pytorch_nn_classificati
 - **Add more hidden units:** Go from 5 hidden units to 10 hidden units
 - **Fit for longer:** Give it more time/epochs
 - **Change the learning rate:** If its too small or high the model will not perform well
+- **The missing peice: non-linearity:** We needed to use ReLu to allow the model to learn something non-linear
 
-## The missing peice: non-linearity

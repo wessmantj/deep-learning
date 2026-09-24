@@ -5,11 +5,11 @@ Ran locally on Apple Silicon using the MPS (GPU) backend.
 
 Companion notes: 02_pytorch_nn_classification.md
 """
-
+# %% Imports cell
 from typing import Any
 
 import sklearn
-from sklearn.datasets import make_circles
+from sklearn.datasets import make_circles, make_blobs
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -18,6 +18,16 @@ from torch import nn
 import requests
 import numpy as np 
 from pathlib import Path
+
+# device agnostic 
+if torch.cuda.is_available():
+    device = "cuda"          # NVIDIA GPU 
+elif torch.backends.mps.is_available():
+    device = "mps"           # Apple Silicon GPU
+else:
+    device = "cpu"           # fallback
+print(f"\nUsing device: {device}")
+# %% Part 1: Binary Classification
 
 # Make classification data and get ready
 n_samples = 1000
@@ -412,4 +422,76 @@ plot_decision_boundary(model=model_3,
                        X=X_test,
                        y=y_test)
 plt.show()
-# improved with more epochs
+# improved with more epochs and one more layer
+
+A = torch.arange(-10, 10, 1, dtype=torch.float32)
+
+def relu(x: torch.Tensor) -> torch.Tensor:
+    return torch.maximum(torch.tensor(0), x)
+
+def sigmoid(x: torch.Tensor) -> torch.Tensor:
+    return 1 / (1 + torch.exp(-x))
+
+
+# %% Part 2: Multi-Class Classification
+
+# Set the hyperparameters for data creation
+NUM_CLASSES = 4
+NUM_FEATURES = 2
+RANDOM_SEED = 42
+
+# Create multi-class data
+X_blob, y_blob = make_blobs(n_samples=1000,
+                            n_features=NUM_FEATURES,
+                            centers=NUM_CLASSES,
+                            cluster_std=1.75,
+                            random_state=RANDOM_SEED)
+
+X_blob = torch.from_numpy(X_blob).type(torch.float32).to(device)
+y_blob = torch.from_numpy(y_blob).type(torch.float32).to(device)
+
+X_blob_train, X_blob_test, y_blob_train, y_blob_test = train_test_split(X_blob,
+                                                                        y_blob,
+                                                                        test_size=0.2,
+                                                                        random_state=RANDOM_SEED)
+
+# Visualize/Plot data
+
+plt.figure(figsize=(10, 7))
+plt.scatter(X_blob[:, 0].cpu(), X_blob[:, 1].cpu(), c=y_blob.cpu(), cmap=plt.cm.RdYlBu)
+plt.show()
+
+
+# Make model to classify 4-different clusters
+class BlobModel(nn.Module):
+    def __init__(self, input_features: int, output_features: int, hidden_units: int=8) -> None:
+        """
+        Initializes multi-class classification model
+        
+        Args:
+            input_features (int): Number of input features to the model
+            output_features (int): Number of output features
+            hidden_units (int): Number of hidden units between layers; default 8
+        """
+        super().__init__()
+        
+        self.linear_layer_stack = nn.Sequential(
+            nn.Linear(in_features=input_features, out_features=hidden_units),
+            nn.ReLU(),
+            nn.Linear(in_features=hidden_units, out_features=hidden_units),
+            nn.ReLU(),
+            nn.Linear(in_features=hidden_units, out_features=output_features)
+        )
+        
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.linear_layer_stack(x)
+    
+
+# Create an instance of BlobModel 
+model_4 = BlobModel(input_features=2,
+                    output_features=4,
+                    hidden_units=8)
+
+
+    
+    
