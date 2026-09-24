@@ -27,6 +27,18 @@ elif torch.backends.mps.is_available():
 else:
     device = "cpu"           # fallback
 print(f"\nUsing device: {device}")
+
+if Path("helper_functions.py").is_file():
+    print("helper_functions.py already exists, skipping download.")
+else:
+    print("Downloading helper_functions.py")
+    request = requests.get("https://raw.githubusercontent.com/mrdbourke/pytorch-deep-learning/refs/heads/main/helper_functions.py")
+    with open("helper_functions.py", "wb") as f:
+        f.write(request.content)
+        
+from helper_functions import plot_predictions, plot_decision_boundary
+
+
 # %% Part 1: Binary Classification
 
 # Make classification data and get ready
@@ -171,16 +183,6 @@ for epoch in range(epochs):
         print(f"EPOCH: {epoch} | LOSS: {loss:.6f} | TEST LOSS: {test_loss:.6f} | TEST ACC: {test_acc:.2f}")
             
 # Make predictions and evaluate why model isn't learning
-    
-if Path("helper_functions.py").is_file():
-    print("helper_functions.py already exists, skipping download.")
-else:
-    print("Downloading helper_functions.py")
-    request = requests.get("https://raw.githubusercontent.com/mrdbourke/pytorch-deep-learning/refs/heads/main/helper_functions.py")
-    with open("helper_functions.py", "wb") as f:
-        f.write(request.content)
-        
-from helper_functions import plot_predictions, plot_decision_boundary
 
 plt.figure(figsize=(12, 6))
 plt.subplot(1, 2, 1)
@@ -461,6 +463,12 @@ plt.figure(figsize=(10, 7))
 plt.scatter(X_blob[:, 0].cpu(), X_blob[:, 1].cpu(), c=y_blob.cpu(), cmap=plt.cm.RdYlBu)
 plt.show()
 
+def accuracy_fn(y_true, y_pred):
+    correct = torch.eq(y_true, y_pred).sum().item()
+    acc = (correct/len(y_pred) * 100)
+    
+    return acc
+
 
 # Make model to classify 4-different clusters
 class BlobModel(nn.Module):
@@ -490,8 +498,60 @@ class BlobModel(nn.Module):
 # Create an instance of BlobModel 
 model_4 = BlobModel(input_features=2,
                     output_features=4,
-                    hidden_units=8)
+                    hidden_units=8).to(device)
 
+# Loss function and Optimizer
+
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(model_4.parameters(), lr=0.1)
+X_blob_train, y_blob_train = X_blob_train.to(device), y_blob_train.to(device)
+X_blob_test, y_blob_test = X_blob_test.to(device), y_blob_test.to(device)
+
+epochs = 1000
+
+for epoch in range(epochs):
+    
+    model_4.train()
+        
+    y_logits = model_4(X_blob_train)
+    y_pred = torch.softmax(y_logits, dim=1).argmax(dim=1)
+    
+    loss = loss_fn(y_logits, y_blob_train.type(torch.long))
+    acc = accuracy_fn(y_true=y_blob_train,
+                      y_pred=y_pred)
+    
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+        
+        
+    # Training
+    model_4.eval()
+    with torch.inference_mode():
+        test_logits = model_4(X_blob_test)
+        test_pred = torch.softmax(test_logits, dim=1).argmax(dim=1)
+        
+        test_loss = loss_fn(test_logits, y_blob_test.type(torch.long))
+        test_acc = accuracy_fn(y_true=y_blob_test,
+                               y_pred=test_pred)
+            
+    if epoch % 50 == 0:
+        print(f"EPOCH: {epoch} | LOSS: {loss:.6f} | TEST LOSS: {test_loss:.6f} | TEST ACC: {test_acc:.2f}")
 
     
-    
+# Make predicitons
+model_4.eval()
+with torch.inference_mode():
+    y_logits = model_4(X_blob_test)
+
+y_pred_probs = torch.softmax(y_logits, dim=1)
+y_preds = torch.argmax(y_pred_probs, dim=1)
+
+plt.figure(figsize=(12, 6))
+plt.subplot(1, 2, 1)
+plt.title("Train")
+plot_decision_boundary(model_4, X_blob_train, y_blob_train)
+plt.subplot(1, 2, 2)
+plt.title("Test")
+plot_decision_boundary(model_4, X_blob_test, y_blob_test)
+plt.show()
