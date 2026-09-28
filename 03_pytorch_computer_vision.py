@@ -114,3 +114,47 @@ plt.axis(False)
 print(f"Image size: {img.shape}")
 print(f"Label: {label}, label size: {label.shape}")
 plt.show()
+
+# Building a baseline model; Model 0
+
+# create a flatten layer
+flatten_model = nn.Flatten()
+
+# get a single sample
+x = train_features_batch[0]
+# flatten the sample
+output = flatten_model(x)
+
+print(f"Shape before flattening: {x.shape}")
+print(f"Shape after flattening: {output.shape}")
+
+class FashionMNISTModelV0(nn.Module):
+    def __init__(self,
+                 input_shape: int,
+                 output_shape: int,
+                 hidden_units: int) -> None:
+        super().__init__()
+        self.layer_stack = nn.Sequential(
+            nn.Flatten(),       # flattens whatever comes in first
+            nn.Linear(in_features=input_shape,
+                      out_features=hidden_units),
+            nn.Linear(in_features=hidden_units,
+                      out_features=output_shape)
+        )
+        
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.layer_stack(x)
+        
+        
+torch.manual_seed(42)
+model_0 = FashionMNISTModelV0(
+    input_shape=784,    # output of flatten needs to be inpute shape (28, 28)
+    output_shape=len(class_names),  # one for every class
+    hidden_units=10
+)
+model_0.to("cpu")
+
+dummy_x = torch.rand([1, 1, 28, 28])
+model_0(dummy_x) # 10 logits out; one for each class
+
+
