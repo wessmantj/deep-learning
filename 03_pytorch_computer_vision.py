@@ -11,6 +11,7 @@ import pandas as pd
 import requests
 import numpy as np 
 from pathlib import Path
+from torch.utils.data import DataLoader
 
 
 # device agnostic 
@@ -84,3 +85,32 @@ for i in range(1, rows*cols+1):
     plt.axis(False)
     plt.show()
     
+# Prepare DataLoader; turns dataset into Python iterable or batches/mini-batches
+
+# batchsize hyperparameter
+BATCH_SIZE = 32
+
+train_dataloader = DataLoader(dataset=train_data,
+                              batch_size=BATCH_SIZE,
+                              shuffle=True) # good to shuffle data so model doesn't learn order
+test_dataloader = DataLoader(dataset=test_data,
+                             batch_size=BATCH_SIZE,
+                             shuffle=False) # can shuffle, but easier to evaluate when in same order; just eval so it can't learn here
+
+print(f"Dataloaders: \n{train_dataloader} \n{test_dataloader}")
+print(f"Length train_dataloader: \n{len(train_dataloader)} batches of {BATCH_SIZE}...") # 60000 // 32
+print(f"Length test_dataloader: \n{len(test_dataloader)} batches of {BATCH_SIZE}...") # 1000 // 32
+
+# see whats inside the training dataloader
+train_features_batch, train_labels_batch = next(iter(train_dataloader))
+
+# show a sample
+torch.manual_seed(42)
+random_idx = torch.randint(0, len(train_features_batch), size=[1]).item()
+img, label = train_features_batch[random_idx], train_labels_batch[random_idx]
+plt.imshow(img.squeeze(), cmap="gray")
+plt.title(class_names[label])
+plt.axis(False)
+print(f"Image size: {img.shape}")
+print(f"Label: {label}, label size: {label.shape}")
+plt.show()
